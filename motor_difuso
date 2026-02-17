@@ -1,0 +1,174 @@
+from owlready2 import *
+from pathlib import Path
+import json
+import numpy as np
+
+POBLADA_OWL = Path("ontologia_poblada.rdf")
+JSON_FILE = Path("escenario.json")
+
+DB_INCIDENTES_BASE = {
+    "Fallo":         {"prob": 0.35, "imp": 0.15}, 
+    "Interferencia": {"prob": 0.55, "imp": 0.37},
+    "Ataque":        {"prob": 0.52, "imp": 0.58},
+    "Sabotaje":      {"prob": 0.33, "imp": 0.76}
+}
+
+DB_ACCIONES = {
+    "Muy Bajo": {"accion": "Monitorizar",                "red_p": 0.00, "red_i": 0.00},
+    "Bajo":     {"accion": "Respuesta local",            "red_p": 0.10, "red_i": 0.10},
+    "Medio":    {"accion": "Aislar y contener",          "red_p": 0.20, "red_i": 0.30},
+    "Alto":     {"accion": "Despliegue de contingencia", "red_p": 0.20, "red_i": 0.40},
+    "Critico":  {"accion": "Escalada inmediata",         "red_p": 0.30, "red_i": 0.50}
+}
+NIVEL_PRIORIDAD = {"Critico": 5, "Alto": 4, "Medio": 3, "Bajo": 2, "Muy Bajo": 1}
+
+def trap(x, a, b, c, d):
+    if x <= a or x >= d: return 0.0
+    if b <= x <= c:      return 1.0
+    if x < b:            return (x-a)/(b-a) if b != a else 1.0
+    return (d-x)/(d-c)   if d != c else 1.0
+
+def tri(x, a, b, c):
+    if x <= a or x >= c: return 0.0
+    if x == b:           return 1.0
+    if x < b:            return (x-a)/(b-a) if b != a else 1.0
+    return (c-x)/(c-b)   if c != b else 1.0
+
+def get_membership(x):
+    return {
+        "Muy Baja": trap(x, 0.00, 0.00, 0.10, 0.20),
+        "Baja":     tri (x, 0.10, 0.25, 0.40),
+        "Media":    tri (x, 0.30, 0.45, 0.60),
+        "Alta":     tri (x, 0.50, 0.65, 0.80),
+        "Muy Alta": trap(x, 0.70, 0.90, 1.00, 1.00),
+    }
+
+def normalizar(vector):
+    max_val = max(vector.values())
+    if max_val == 0: return vector
+    return {k: v / max_val for k, v in vector.items()}
+
+def aplicar_ajuste(vector, nivel):
+    coefs = {"Ninguno":(1.0, 1.0), "Leve":(0.9, 1.1), "Moderado":(0.75, 1.3), "Fuerte":(0.5, 1.6)}
+    m_low, m_high = coefs.get(nivel, (1.0, 1.0))
+    nuevo = {}
+    for k, v in vector.items():
+        if k in ["Muy Baja", "Baja", "Media"]: nuevo[k] = v * m_low
+        else:                                  nuevo[k] = v * m_high
+    return normalizar(nuevo)
+
+def aplicar_mitigacion(vector, factor):
+    nuevo = {}
+    for k, v in vector.items():
+        if k in ["Alta", "Muy Alta"]: nuevo[k] = v * (1.0 - factor)
+        else:                         nuevo[k] = v 
+    return normalizar(nuevo)
+
+def calcular_riesgo_matriz(p_vec, i_vec):
+    MATRIZ = {
+        ("Muy Baja", "Muy Baja"): "Muy Bajo", ("Muy Baja", "Baja"): "Muy Bajo", ("Muy Baja", "Media"): "Bajo",     ("Muy Baja", "Alta"): "Bajo",     ("Muy Baja", "Muy Alta"): "Medio",
+        ("Baja", "Muy Baja"):     "Muy Bajo", ("Baja", "Baja"):     "Bajo",     ("Baja", "Media"):     "Bajo",     ("Baja", "Alta"):     "Medio",    ("Baja", "Muy Alta"):     "Alto",
+        ("Media", "Muy Baja"):    "Bajo",     ("Media", "Baja"):    "Bajo",     ("Media", "Media"):    "Medio",    ("Media", "Alta"):    "Alto",     ("Media", "Muy Alta"):    "Alto",
+        ("Alta", "Muy Baja"):     "Bajo",     ("Alta", "Baja"):     "Medio",    ("Alta", "Media"):     "Alto",     ("Alta", "Alta"):     "Alto",     ("Alta", "Muy Alta"):     "Critico",
+        ("Muy Alta", "Muy Baja"): "Medio",    ("Muy Alta", "Baja"): "Alto",     ("Muy Alta", "Media"): "Alto",     ("Muy Alta", "Alta"): "Critico",  ("Muy Alta", "Muy Alta"): "Critico",
+    }
+    riesgo = {"Muy Bajo": 0.0, "Bajo": 0.0, "Medio": 0.0, "Alto": 0.0, "Critico": 0.0}
+    for p_label, p_val in p_vec.items():
+        if p_val == 0: continue
+        for i_label, i_val in i_vec.items():
+            if i_val == 0: continue
+            nivel = MATRIZ.get((p_label, i_label))
+            riesgo[nivel] = max(riesgo[nivel], min(p_val, i_val))
+    return normalizar(riesgo)
+
+def obtener_nivel_principal(riesgo_vector):
+    nivel_max = "Muy Bajo"
+    for nivel, valor in riesgo_vector.items():
+        if valor > 0.01:
+            if NIVEL_PRIORIDAD[nivel] > NIVEL_PRIORIDAD[nivel_max]:
+                nivel_max = nivel
+            elif NIVEL_PRIORIDAD[nivel] == NIVEL_PRIORIDAD[nivel_max]:
+                if valor > riesgo_vector[nivel_max]: nivel_max = nivel
+    return nivel_max
+
+def calcular_score_numerico(riesgo_vector):
+    valores = {"Muy Bajo": 1, "Bajo": 3, "Medio": 5, "Alto": 7, "Critico": 9}
+    
+    numerador = sum(riesgo_vector[k] * valores[k] for k in riesgo_vector)
+    denominador = sum(riesgo_vector.values())
+    
+    if denominador == 0: return 0.0
+    return numerador / denominador if 'numerador' in locals() else numerador / denominador
+
+def evaluar_contexto(activo_data, mision_data):
+    ajuste_p = "Ninguno"
+    ajuste_i = "Ninguno"
+    
+    con = activo_data.get("conexiones_externas", 0)
+    if con >= 5:   ajuste_p = "Fuerte"
+    elif con >= 2: ajuste_p = "Moderado"
+
+    doms_activo = activo_data.get("dominios", [])
+    if len(doms_activo) > 1:
+        if ajuste_i == "Ninguno": ajuste_i = "Moderado" 
+        elif ajuste_i == "Leve" : ajuste_i = "Moderado"
+
+    deps = activo_data.get("dependencias_criticas", 0)
+    if deps > 3: ajuste_i = "Moderado"
+
+    fase = mision_data.get("fase", "Planeamiento")
+    if fase == "Ejecucion": ajuste_i = "Fuerte"
+
+    return ajuste_p, ajuste_i
+
+try:
+    with open(JSON_FILE, "r", encoding="utf-8") as f:
+        json_data = json.load(f)
+except:
+    print("ERROR no tengo json"); exit()
+
+misiones_dict = {m["id"]: m for m in json_data["misiones"]}
+activos_dict  = {a["id"]: a for a in json_data["activos"]}
+
+
+
+for i_data in json_data["incidentes"]:
+    inc_id = i_data["id"]
+    tipo = i_data.get("tipo_incidente", "Fallo")
+    val_base = DB_INCIDENTES_BASE.get(tipo, {"prob": 0.5, "imp": 0.5})
+
+    for act_id in i_data["afectaA"]:
+        act_context = activos_dict.get(act_id)
+        mision_id   = act_context.get("perteneceAMision")
+        mis_context = misiones_dict.get(mision_id, {})
+
+        ajuste_p, ajuste_i = evaluar_contexto(act_context, mis_context)
+
+        vec_p = get_membership(val_base["prob"])
+        vec_i = get_membership(val_base["imp"])
+        vec_p_adj = aplicar_ajuste(vec_p, ajuste_p)
+        vec_i_adj = aplicar_ajuste(vec_i, ajuste_i)
+        
+        riesgo_inh = calcular_riesgo_matriz(vec_p_adj, vec_i_adj)
+        nivel_inh = obtener_nivel_principal(riesgo_inh)
+        score_inh = calcular_score_numerico(riesgo_inh)
+        
+        datos_accion = DB_ACCIONES.get(nivel_inh)
+        
+        print(f"INCIDENTE: {inc_id} | ACTIVO: {act_id}")
+        print(f"RIESGO INHERENTE: {nivel_inh.upper():<10} (Score: {score_inh:.2f}/10)")
+        
+        if datos_accion:
+            print(f"ACCIÓN: {datos_accion['accion'].upper()}")
+            
+            vec_p_res = aplicar_mitigacion(vec_p_adj, datos_accion['red_p'])
+            vec_i_res = aplicar_mitigacion(vec_i_adj, datos_accion['red_i'])
+            riesgo_res = calcular_riesgo_matriz(vec_p_res, vec_i_res)
+            nivel_res = obtener_nivel_principal(riesgo_res)
+            score_res = calcular_score_numerico(riesgo_res)
+            
+            diff = score_inh - score_res
+            print(f"RIESGO RESIDUAL:  {nivel_res.upper():<10} (Score: {score_res:.2f}/10) [Bajada: {diff:.2f}]")
+        else:
+            print("No tengo accion")
+        print("-" * 70)

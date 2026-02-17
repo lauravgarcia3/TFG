@@ -1,0 +1,535 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#"
+     xml:base="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#activoRelacionadoConDominio -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#activoRelacionadoConDominio">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Activo"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Dominio"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#afectaA -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#afectaA">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <owl:inverseOf rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#esAfectadoPor"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Incidente"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Activo"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#esAfectadoPor -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#esAfectadoPor">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Activo"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Incidente"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#esCriticoPara -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#esCriticoPara">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Activo"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Mision"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#estaEnFase -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#estaEnFase">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Mision"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Fase"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#incidenteAfectaADominio -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#incidenteAfectaADominio">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Incidente"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Dominio"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#misionOperaEnDominio -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#misionOperaEnDominio">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Mision"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Dominio"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#seMitigaCon -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#seMitigaCon">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Riesgo"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Contramedida"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#tieneRiesgo -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#tieneRiesgo">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Activo"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Riesgo"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#tieneVulnerabilidad -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#tieneVulnerabilidad">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Activo"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Vulnerabilidad"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#criticidad -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#criticidad">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Activo"/>
+        <rdfs:range>
+            <rdfs:Datatype>
+                <owl:onDatatype rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+                <owl:withRestrictions rdf:parseType="Collection">
+                    <rdf:Description>
+                        <xsd:minInclusive rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.0</xsd:minInclusive>
+                    </rdf:Description>
+                    <rdf:Description>
+                        <xsd:maxInclusive rdf:datatype="http://www.w3.org/2001/XMLSchema#float">1.0</xsd:maxInclusive>
+                    </rdf:Description>
+                </owl:withRestrictions>
+            </rdfs:Datatype>
+        </rdfs:range>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#descripcion -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#descripcion">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Vulnerabilidad"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#impactoBase -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#impactoBase">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Riesgo"/>
+        <rdfs:range>
+            <rdfs:Datatype>
+                <owl:onDatatype rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+                <owl:withRestrictions rdf:parseType="Collection">
+                    <rdf:Description>
+                        <xsd:minInclusive rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.0</xsd:minInclusive>
+                    </rdf:Description>
+                    <rdf:Description>
+                        <xsd:maxInclusive rdf:datatype="http://www.w3.org/2001/XMLSchema#float">1.0</xsd:maxInclusive>
+                    </rdf:Description>
+                </owl:withRestrictions>
+            </rdfs:Datatype>
+        </rdfs:range>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#impactoResidual -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#impactoResidual">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Riesgo"/>
+        <rdfs:range>
+            <rdfs:Datatype>
+                <owl:onDatatype rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+                <owl:withRestrictions rdf:parseType="Collection">
+                    <rdf:Description>
+                        <xsd:minInclusive rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.0</xsd:minInclusive>
+                    </rdf:Description>
+                    <rdf:Description>
+                        <xsd:maxInclusive rdf:datatype="http://www.w3.org/2001/XMLSchema#float">1.0</xsd:maxInclusive>
+                    </rdf:Description>
+                </owl:withRestrictions>
+            </rdfs:Datatype>
+        </rdfs:range>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#numConexiones -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#numConexiones">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Activo"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#numDependencias -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#numDependencias">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Activo"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#probabilidadBase -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#probabilidadBase">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Riesgo"/>
+        <rdfs:range>
+            <rdfs:Datatype>
+                <owl:onDatatype rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+                <owl:withRestrictions rdf:parseType="Collection">
+                    <rdf:Description>
+                        <xsd:minInclusive rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.0</xsd:minInclusive>
+                    </rdf:Description>
+                    <rdf:Description>
+                        <xsd:maxInclusive rdf:datatype="http://www.w3.org/2001/XMLSchema#float">1.0</xsd:maxInclusive>
+                    </rdf:Description>
+                </owl:withRestrictions>
+            </rdfs:Datatype>
+        </rdfs:range>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#probabilidadResidual -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#probabilidadResidual">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Riesgo"/>
+        <rdfs:range>
+            <rdfs:Datatype>
+                <owl:onDatatype rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+                <owl:withRestrictions rdf:parseType="Collection">
+                    <rdf:Description>
+                        <xsd:minInclusive rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.0</xsd:minInclusive>
+                    </rdf:Description>
+                    <rdf:Description>
+                        <xsd:maxInclusive rdf:datatype="http://www.w3.org/2001/XMLSchema#float">1.0</xsd:maxInclusive>
+                    </rdf:Description>
+                </owl:withRestrictions>
+            </rdfs:Datatype>
+        </rdfs:range>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#reduceImpacto -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#reduceImpacto">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Contramedida"/>
+        <rdfs:range>
+            <rdfs:Datatype>
+                <owl:onDatatype rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+                <owl:withRestrictions rdf:parseType="Collection">
+                    <rdf:Description>
+                        <xsd:minInclusive rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.0</xsd:minInclusive>
+                    </rdf:Description>
+                    <rdf:Description>
+                        <xsd:maxInclusive rdf:datatype="http://www.w3.org/2001/XMLSchema#float">1.0</xsd:maxInclusive>
+                    </rdf:Description>
+                </owl:withRestrictions>
+            </rdfs:Datatype>
+        </rdfs:range>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#reduceProbabilidad -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#reduceProbabilidad">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Contramedida"/>
+        <rdfs:range>
+            <rdfs:Datatype>
+                <owl:onDatatype rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+                <owl:withRestrictions rdf:parseType="Collection">
+                    <rdf:Description>
+                        <xsd:minInclusive rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.0</xsd:minInclusive>
+                    </rdf:Description>
+                    <rdf:Description>
+                        <xsd:maxInclusive rdf:datatype="http://www.w3.org/2001/XMLSchema#float">1.0</xsd:maxInclusive>
+                    </rdf:Description>
+                </owl:withRestrictions>
+            </rdfs:Datatype>
+        </rdfs:range>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#severidadAmenaza -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#severidadAmenaza">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Amenaza"/>
+        <rdfs:range>
+            <rdfs:Datatype>
+                <owl:onDatatype rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+                <owl:withRestrictions rdf:parseType="Collection">
+                    <rdf:Description>
+                        <xsd:minInclusive rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.0</xsd:minInclusive>
+                    </rdf:Description>
+                    <rdf:Description>
+                        <xsd:maxInclusive rdf:datatype="http://www.w3.org/2001/XMLSchema#float">1.0</xsd:maxInclusive>
+                    </rdf:Description>
+                </owl:withRestrictions>
+            </rdfs:Datatype>
+        </rdfs:range>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#severidadIncidente -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#severidadIncidente">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Incidente"/>
+        <rdfs:range>
+            <rdfs:Datatype>
+                <owl:onDatatype rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+                <owl:withRestrictions rdf:parseType="Collection">
+                    <rdf:Description>
+                        <xsd:minInclusive rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.0</xsd:minInclusive>
+                    </rdf:Description>
+                    <rdf:Description>
+                        <xsd:maxInclusive rdf:datatype="http://www.w3.org/2001/XMLSchema#float">1.0</xsd:maxInclusive>
+                    </rdf:Description>
+                </owl:withRestrictions>
+            </rdfs:Datatype>
+        </rdfs:range>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#severidadVulnerabilidad -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#severidadVulnerabilidad">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Vulnerabilidad"/>
+        <rdfs:range>
+            <rdfs:Datatype>
+                <owl:onDatatype rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+                <owl:withRestrictions rdf:parseType="Collection">
+                    <rdf:Description>
+                        <xsd:minInclusive rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.0</xsd:minInclusive>
+                    </rdf:Description>
+                    <rdf:Description>
+                        <xsd:maxInclusive rdf:datatype="http://www.w3.org/2001/XMLSchema#float">1.0</xsd:maxInclusive>
+                    </rdf:Description>
+                </owl:withRestrictions>
+            </rdfs:Datatype>
+        </rdfs:range>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#tieneRedundancia -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#tieneRedundancia">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Activo"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Activo -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Activo"/>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Aislar_y_Contener -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Aislar_y_Contener">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Contramedida"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Amenaza -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Amenaza"/>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Ataque -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Ataque">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Incidente"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Contramedida -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Contramedida"/>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Despliegue_Contingencia -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Despliegue_Contingencia">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Contramedida"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Dominio -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Dominio"/>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Escalada_Inmediata -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Escalada_Inmediata">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Contramedida"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Fallo -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Fallo">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Incidente"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Fase -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Fase"/>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Incidente -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Incidente"/>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Interferencia -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Interferencia">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Incidente"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Mision -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Mision"/>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Monitorizacion -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Monitorizacion">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Contramedida"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Respuesta_Local -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Respuesta_Local">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Contramedida"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Riesgo -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Riesgo"/>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Sabotaje -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Sabotaje">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Incidente"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Vulnerabilidad -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/vicen/ontologias/gestion_riesgos_multidominio#Vulnerabilidad"/>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi -->
+

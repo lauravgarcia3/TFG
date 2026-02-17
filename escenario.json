@@ -1,0 +1,50 @@
+{
+  "misiones": [
+    {
+      "id": "Mision_Operacion_A1",
+      "fase": "Ejecucion",
+      "dominios": ["DominioMar", "DominioCiber"],
+      "descripcion": "Vigilancia costera zona norte"
+    }
+  ],
+  "activos": [
+    {
+      "id": "Activo_SATCOM_1",
+      "tipo_activo": "Comunicaciones",
+      "criticidad": 0.9,
+      "perteneceAMision": "Mision_Operacion_A1",
+      "conexiones_externas": 8,
+      "tiene_redundancia": false,
+      "dominios": ["DominioCiber", "DominioEspacio"], 
+      "dependencias_criticas": 4
+    },
+    {
+      "id": "Activo_Radar",
+      "tipo_activo": "Sensor",
+      "criticidad": 0.6,
+      "perteneceAMision": "Mision_Operacion_A1",
+      "conexiones_externas": 1,
+      "tiene_redundancia": true,
+      "dominios": ["DominioCiber"],
+      "dependencias_criticas": 0
+    }
+  ],
+  "incidentes": [
+    {
+      "id": "Interferencia_GPS_Critica",
+      "tipo_incidente": "Interferencia",
+      "afectaA": ["Activo_SATCOM_1"],
+      "dominios": ["DominioCiber"]
+    },
+    {
+      "id": "Ataque_DDoS_Radar",
+      "tipo_incidente": "Ataque",
+      "afectaA": ["Activo_Radar"],
+      "dominios": ["DominioCiber"]
+    }
+  ],
+  "riesgos": [
+    { "id": "Riesgo_Perdida_Comunicaciones" },
+    { "id": "Riesgo_Ceguera_Radar" }
+  ]
+}
