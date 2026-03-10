@@ -1,0 +1,354 @@
+from owlready2 import *
+from pathlib import Path
+import json
+import numpy as np
+import skfuzzy as fuzz
+
+POBLADA_OWL = Path("ontologia_poblada.rdf")
+JSON_FILE = Path("escenario.json")
+
+# =============================================================================
+# DATOS
+# =============================================================================
+
+DB_INCIDENTES_BASE = {
+    "Fallo":         {"prob": 0.35, "imp": 0.15}, 
+    "Interferencia": {"prob": 0.55, "imp": 0.37},
+    "Ataque":        {"prob": 0.52, "imp": 0.58},
+    "Sabotaje":      {"prob": 0.33, "imp": 0.76}
+}
+
+DB_ACCIONES = {
+    "Muy Bajo": {"accion": "Monitorizar",                "red_p": 0.00, "red_i": 0.00},
+    "Bajo":     {"accion": "Respuesta local",            "red_p": 0.10, "red_i": 0.10},
+    "Medio":    {"accion": "Aislar y contener",          "red_p": 0.20, "red_i": 0.30},
+    "Alto":     {"accion": "Despliegue de contingencia", "red_p": 0.20, "red_i": 0.40},
+    "Critico":  {"accion": "Escalada inmediata",         "red_p": 0.30, "red_i": 0.50}
+}
+
+
+# =============================================================================
+# LÓGICA DIFUSA CON NUEVA LIBRERIA
+# =============================================================================
+
+x_pi = np.arange(0, 1.01, 0.01)      # Probabilidad e Impacto del 0 al 1
+x_riesgo = np.arange(0, 1.01, 0.01)  # Riesgo del 0 al 1
+
+# Curvas de Entrada (Probabilidad / Impacto)
+pi_mfs = {
+    "Muy Baja": fuzz.trapmf(x_pi, [0.0, 0.0, 0.1, 0.2]),
+    "Baja":     fuzz.trimf (x_pi, [0.1, 0.25, 0.4]),
+    "Media":    fuzz.trimf (x_pi, [0.3, 0.45, 0.6]),
+    "Alta":     fuzz.trimf (x_pi, [0.5, 0.65, 0.8]),
+    "Muy Alta": fuzz.trapmf(x_pi, [0.7, 0.9, 1.0, 1.0]),
+}
+
+# Curvas de Salida (Riesgo)
+riesgo_mfs = {
+    "Muy Bajo": fuzz.trapmf(x_riesgo, [0.0, 0.0, 0.1, 0.2]),
+    "Bajo":     fuzz.trimf (x_riesgo, [0.1, 0.25, 0.4]),
+    "Medio":    fuzz.trimf (x_riesgo, [0.3, 0.45, 0.6]),
+    "Alto":     fuzz.trimf (x_riesgo, [0.5, 0.65, 0.8]),
+    "Critico":  fuzz.trapmf(x_riesgo, [0.7, 0.9, 1.0, 1.0]),
+}
+
+def get_membership_skfuzzy(valor_crisp):
+    vector = {}
+    for etiqueta, curva in pi_mfs.items():
+        vector[etiqueta] = fuzz.interp_membership(x_pi, curva, valor_crisp)
+    return vector
+
+
+# =============================================================================
+# Funciones ajustar y mitigar  
+# =============================================================================
+
+def aplicar_ajuste(vector, nivel):
+    factores = {"Ninguno": 0.0, "Leve": 0.10, "Moderado": 0.25, "Fuerte": 0.50}
+    factor = factores.get(nivel, 0.0)
+    if factor == 0.0: return vector.copy() 
+
+    nuevo = vector.copy()
+
+    t_mb = vector["Muy Baja"] * factor
+    t_b  = vector["Baja"] * factor
+    t_m  = vector["Media"] * factor
+    t_a  = vector["Alta"] * factor
+
+    nuevo["Muy Baja"] = max(0.0, vector["Muy Baja"] - t_mb)
+    nuevo["Baja"]     = min(1.0, vector["Baja"] + t_mb - t_b)
+    nuevo["Media"]    = min(1.0, vector["Media"] + t_b - t_m)
+    nuevo["Alta"]     = min(1.0, vector["Alta"] + t_m - t_a)
+    nuevo["Muy Alta"] = min(1.0, vector["Muy Alta"] + t_a)
+
+    return nuevo
+
+def aplicar_mitigacion_desplazamiento(vector, factor):
+    nuevo = vector.copy()
+   
+    t_ma = vector["Muy Alta"] * factor
+    t_a  = vector["Alta"] * factor
+    t_m  = vector["Media"] * factor
+    t_b  = vector["Baja"] * factor
+    
+    nuevo["Muy Alta"] = max(0.0, vector["Muy Alta"] - t_ma)
+    nuevo["Alta"]     = min(1.0, vector["Alta"] + t_ma - t_a)
+    nuevo["Media"]    = min(1.0, vector["Media"] + t_a - t_m)
+    nuevo["Baja"]     = min(1.0, vector["Baja"] + t_m - t_b)
+    nuevo["Muy Baja"] = min(1.0, vector["Muy Baja"] + t_b)
+     
+    return nuevo
+
+# =============================================================================
+# INFERENCIA Y DEFUZZIFICACIÓN
+# =============================================================================
+def inferencia_y_defuzzificacion(p_vec, i_vec):
+    MATRIZ = {
+        ("Muy Baja", "Muy Baja"): "Muy Bajo", ("Muy Baja", "Baja"): "Muy Bajo", ("Muy Baja", "Media"): "Bajo",     ("Muy Baja", "Alta"): "Bajo",     ("Muy Baja", "Muy Alta"): "Medio",
+        ("Baja", "Muy Baja"):     "Muy Bajo", ("Baja", "Baja"):     "Bajo",     ("Baja", "Media"):     "Bajo",     ("Baja", "Alta"):     "Medio",    ("Baja", "Muy Alta"):     "Alto",
+        ("Media", "Muy Baja"):    "Bajo",     ("Media", "Baja"):    "Bajo",     ("Media", "Media"):    "Medio",    ("Media", "Alta"):    "Alto",     ("Media", "Muy Alta"):    "Alto",
+        ("Alta", "Muy Baja"):     "Bajo",     ("Alta", "Baja"):     "Medio",    ("Alta", "Media"):     "Alto",     ("Alta", "Alta"):     "Alto",     ("Alta", "Muy Alta"):     "Critico",
+        ("Muy Alta", "Muy Baja"): "Medio",    ("Muy Alta", "Baja"): "Alto",     ("Muy Alta", "Media"): "Alto",     ("Muy Alta", "Alta"): "Critico",  ("Muy Alta", "Muy Alta"): "Critico",
+    }
+
+    riesgo = {"Muy Bajo": 0.0, "Bajo": 0.0, "Medio": 0.0, "Alto": 0.0, "Critico": 0.0}
+    
+    for p_label, p_val in p_vec.items():
+        if p_val == 0: continue
+        for i_label, i_val in i_vec.items():
+            if i_val == 0: continue
+            fuerza = min(p_val, i_val)
+            nivel = MATRIZ.get((p_label, i_label))
+            riesgo[nivel] = max(riesgo[nivel], fuerza)
+
+    agregado = np.zeros_like(x_riesgo)
+    for nivel, activacion in riesgo.items():
+        if activacion > 0:
+            corte = np.fmin(activacion, riesgo_mfs[nivel])
+            agregado = np.fmax(agregado, corte)
+
+
+    if np.sum(agregado) == 0:
+        return riesgo, 0.0
+    
+    score = fuzz.defuzz(x_riesgo, agregado, 'centroid')
+    return riesgo, score
+
+def obtener_nivel_principal(riesgo_vector):
+   return max(riesgo_vector, key=riesgo_vector.get)
+
+
+# =============================================================================
+# REGLAS
+# =============================================================================
+def evaluar_contexto(activo_data, mision_data):
+    ajuste_p = "Ninguno"
+    ajuste_i = "Ninguno"
+    total_red = mision_data.get("total_nodos_red", 1)
+    
+    con = activo_data.get("conexiones_externas", 0)
+
+    if total_red > 0:
+        ratio_con = con / total_red
+    else:
+        ratio_con = 0
+    if ratio_con > 0.5:
+        ajuste_p = "Fuerte"
+    elif ratio_con > 0.2:
+        ajuste_p = "Moderado"
+
+    doms_activo = activo_data.get("dominios", [])
+    if len(doms_activo) > 1:
+        if ajuste_i == "Ninguno": ajuste_i = "Moderado" 
+        elif ajuste_i == "Leve" : ajuste_i = "Moderado"
+
+    deps = activo_data.get("numDependencias", 0)
+    ratio_deps = deps / total_red if total_red > 0 else 0
+    if ratio_deps >= 0.3:
+            ajuste_i = "Fuerte"
+    elif ratio_deps >= 0.1:
+        if ajuste_i == "Ninguno" or ajuste_i == "Leve": 
+            ajuste_i = "Moderado"
+
+    fase = mision_data.get("fase", "Planeamiento")
+    if fase == "Ejecucion": ajuste_i = "Fuerte"
+    elif fase == "Completada":
+        ajuste_i = "Ninguno" 
+
+    tiene_redundancia = activo_data.get("tiene_redundancia", False)
+    if tiene_redundancia:
+        if ajuste_i == "Fuerte":
+            ajuste_i = "Moderado"
+        elif ajuste_i == "Moderado":
+            ajuste_i = "Leve"
+        elif ajuste_i == "Leve":
+            ajuste_i = "Ninguno"
+
+    return ajuste_p, ajuste_i
+
+  
+def aplicar_ajuste_criticidad(vector, factor):
+    nuevo = vector.copy()
+    t_mb = vector["Muy Baja"] * factor
+    t_b  = vector["Baja"] * factor
+    t_m  = vector["Media"] * factor
+    t_a  = vector["Alta"] * factor
+    
+    nuevo["Muy Baja"] = max(0.0, vector["Muy Baja"] - t_mb)
+    nuevo["Baja"]     = min(1.0, vector["Baja"] + t_mb - t_b)
+    nuevo["Media"]    = min(1.0, vector["Media"] + t_b - t_m)
+    nuevo["Alta"]     = min(1.0, vector["Alta"] + t_m - t_a)
+    nuevo["Muy Alta"] = min(1.0, vector["Muy Alta"] + t_a)
+    
+    return nuevo  
+
+
+# =============================================================================
+#  EJECUCIÓN PRINCIPAL
+# =============================================================================
+try:
+    with open(JSON_FILE, "r", encoding="utf-8") as f:
+        json_data = json.load(f)
+except:
+    print("ERROR no tengo JSON"); exit()
+
+misiones_dict = {m["id"]: m for m in json_data.get("misiones", [])}
+activos_dict  = {a["id"]: a for a in json_data.get("activos", [])}
+
+# Diccionarios para almacenar los valores de riesgo antes y después de mitigacion
+nodos_riesgo_inh = {}
+nodos_riesgo_res = {}
+
+for i_data in json_data.get("incidentes", []):
+    inc_id = i_data["id"]
+    tipo = i_data.get("tipo_incidente", "Fallo")
+    val_base = DB_INCIDENTES_BASE.get(tipo, {"prob": 0.5, "imp": 0.5})
+
+    for act_id in i_data.get("afectaA", []):
+        act_context = activos_dict.get(act_id)
+        if not act_context: continue
+        
+        mision_id   = act_context.get("perteneceAMision")
+        mis_context = misiones_dict.get(mision_id, {})
+        if not mis_context and json_data.get("misiones"):
+            mis_context = json_data["misiones"][0] 
+
+        ajuste_p, ajuste_i = evaluar_contexto(act_context, mis_context)
+
+        vec_p = get_membership_skfuzzy(val_base["prob"])
+        vec_i = get_membership_skfuzzy(val_base["imp"])
+        
+        vec_p_adj = aplicar_ajuste(vec_p, ajuste_p)
+        vec_i_adj = aplicar_ajuste(vec_i, ajuste_i)
+
+        criticidad = act_context.get("criticidad", 0.0)
+        umbral_critico = 0.6
+        desplazamiento_maximo = 0.3
+        p = 2 
+        if criticidad > umbral_critico:
+            base = (criticidad - umbral_critico) / (1.0 - umbral_critico)
+            factor_desplazamiento = min(desplazamiento_maximo, desplazamiento_maximo * (base ** p))
+            vec_i_adj = aplicar_ajuste_criticidad(vec_i_adj, factor_desplazamiento)
+
+        riesgo_inh_vec, score_inh = inferencia_y_defuzzificacion(vec_p_adj, vec_i_adj)
+        nivel_inh = obtener_nivel_principal(riesgo_inh_vec)
+        
+        datos_accion = DB_ACCIONES.get(nivel_inh)
+        
+        print(f"INCIDENTE: {inc_id} | ACTIVO: {act_id}")
+        print(f"RIESGO INHERENTE: {nivel_inh.upper():<10} (Score: {score_inh:.3f}/1.00)")
+        
+        nodos_riesgo_inh[act_id] = score_inh
+        
+        if datos_accion:
+            print(f"ACCIÓN: {datos_accion['accion'].upper()}")
+            
+            vec_p_res = aplicar_mitigacion_desplazamiento(vec_p_adj, datos_accion['red_p'])
+            vec_i_res = aplicar_mitigacion_desplazamiento(vec_i_adj, datos_accion['red_i'])
+            
+            riesgo_res_vec, score_res = inferencia_y_defuzzificacion(vec_p_res, vec_i_res)
+            nivel_res = obtener_nivel_principal(riesgo_res_vec)
+            
+            diff = score_inh - score_res
+            print(f"RIESGO RESIDUAL:  {nivel_res.upper():<10} (Score: {score_res:.3f}/1.00) [Bajada: {diff:.3f}]")
+            
+            nodos_riesgo_res[act_id] = score_res
+        else:
+            print("ACCIÓN: No definida")
+            nodos_riesgo_res[act_id] = score_inh
+            
+        print("-" * 70)
+
+
+# =============================================================================
+# PROPAGACIÓN DEL RIESGO 
+# =============================================================================
+
+hijos_de = {}
+categorias = ["activos", "tareas", "actividades", "efectos", "condiciones_decisivas", "lineas_operacion", "objetivos"]
+
+for cat in categorias:
+    for item in json_data.get(cat, []):
+        padre_id = item.get("contribuyeA")
+        if padre_id:
+            if padre_id not in hijos_de:
+                hijos_de[padre_id] = []
+            hijos_de[padre_id].append(item)
+
+orden_escalada = [
+    ("TAREA", json_data.get("tareas", [])),
+    ("ACTIVIDAD", json_data.get("actividades", [])),
+    ("EFECTO", json_data.get("efectos", [])),
+    ("CONDICION DECISIVA", json_data.get("condiciones_decisivas", [])),
+    ("LINEA DE OPERACION", json_data.get("lineas_operacion", [])),
+    ("OBJETIVO", json_data.get("objetivos", [])),
+    ("MISION", json_data.get("misiones", []))
+]
+
+print("\n======================================================================")
+print("PROPAGACION DE RIESGO INHERENTE (ANTES DE MITIGACION)")
+print("======================================================================")
+for nombre_nivel, elementos in orden_escalada:
+    for elemento in elementos:
+        elem_id = elemento["id"]
+        riesgo_acumulado = 0.0
+        
+        if elem_id in hijos_de:
+            for hijo in hijos_de[elem_id]:
+                hijo_id = hijo["id"]
+                peso = hijo.get("peso", 1.0)
+                riesgo_hijo = nodos_riesgo_inh.get(hijo_id, 0.0)
+                riesgo_acumulado += riesgo_hijo * peso
+        
+        # Filtro de umbral para Condiciones Decisivas
+        if nombre_nivel == "CONDICION DECISIVA":
+            umbral = elemento.get("umbral", 0.0)
+            if riesgo_acumulado <= umbral:
+                riesgo_acumulado = 0.0
+                
+        nodos_riesgo_inh[elem_id] = riesgo_acumulado
+        print(f"RIESGO {nombre_nivel}: {elem_id} (Score: {riesgo_acumulado:.3f})")
+
+print("\n======================================================================")
+print("PROPAGACION DE RIESGO RESIDUAL (DESPUES DE MITIGACION)")
+print("======================================================================")
+for nombre_nivel, elementos in orden_escalada:
+    for elemento in elementos:
+        elem_id = elemento["id"]
+        riesgo_acumulado = 0.0
+        
+        if elem_id in hijos_de:
+            for hijo in hijos_de[elem_id]:
+                hijo_id = hijo["id"]
+                peso = hijo.get("peso", 1.0)
+                riesgo_hijo = nodos_riesgo_res.get(hijo_id, 0.0)
+                riesgo_acumulado += riesgo_hijo * peso
+        
+        # Filtro de umbral para Condiciones Decisivas
+        if nombre_nivel == "CONDICION DECISIVA":
+            umbral = elemento.get("umbral", 0.0)
+            if riesgo_acumulado <= umbral:
+                riesgo_acumulado = 0.0
+                
+        nodos_riesgo_res[elem_id] = riesgo_acumulado
+        print(f"RIESGO {nombre_nivel}: {elem_id} (Score: {riesgo_acumulado:.3f})")
