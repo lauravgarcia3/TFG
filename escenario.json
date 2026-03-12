@@ -1,0 +1,152 @@
+{
+  "misiones": [
+    {
+      "id": "Mision_Operacion_A1",
+      "fase": "Ejecucion",
+      "dominios": ["DominioMar", "DominioCiber"],
+      "descripcion": "Vigilancia costera zona norte",
+      "total_nodos_red": 15
+    }
+  ],
+  "objetivos": [
+    {
+      "id": "Objetivo_Asegurar_Zona",
+      "contribuyeA": "Mision_Operacion_A1",
+      "peso": 1.0
+    }
+  ],
+  "lineas_operacion": [
+    {
+      "id": "LO_Dominio_Entorno",
+      "contribuyeA": "Objetivo_Asegurar_Zona",
+      "peso": 1.0
+    }
+  ],
+  "condiciones_decisivas": [
+    {
+      "id": "CD_Superioridad_Informacion",
+      "contribuyeA": "LO_Dominio_Entorno",
+      "peso": 0.60,
+      "umbral": 0.30 
+    },
+    {
+      "id": "CD_Proteccion_Fuerza",
+      "contribuyeA": "LO_Dominio_Entorno",
+      "peso": 0.40,
+      "umbral": 0.40 
+    }
+  ],
+  "efectos": [
+    {
+      "id": "Efecto_Deteccion_Temprana",
+      "contribuyeA": "CD_Superioridad_Informacion",
+      "peso": 1.0
+    },
+    {
+      "id": "Efecto_Continuidad_Mando",
+      "contribuyeA": "CD_Proteccion_Fuerza",
+      "peso": 1.0
+    }
+  ],
+  "acciones": [
+    {
+      "id": "Accion_Vigilancia_Conjunta",
+      "contribuyeA": "Efecto_Deteccion_Temprana",
+      "peso": 1.0
+    },
+    {
+      "id": "Accion_Mantenimiento_Red",
+      "contribuyeA": "Efecto_Continuidad_Mando",
+      "peso": 1.0
+    }
+  ],
+  "tareas": [
+    {
+      "id": "Tarea_Enlace_Mando",
+      "contribuyeA": "Accion_Vigilancia_Conjunta",
+      "peso": 0.60
+    },
+    {
+      "id": "Tarea_Exploracion",
+      "contribuyeA": "Accion_Vigilancia_Conjunta",
+      "peso": 0.40
+    },
+    {
+      "id": "Tarea_Cifrado_Datos",
+      "contribuyeA": "Accion_Mantenimiento_Red",
+      "peso": 1.0
+    }
+  ],
+  "activos": [
+    {
+      "id": "Activo_SATCOM_1",
+      "tipo_activo": "Comunicaciones",
+      "criticidad": 0.9,
+      "contribuyeA": "Tarea_Enlace_Mando",
+      "peso": 0.70,
+      "conexiones_externas": 8,
+      "tiene_redundancia": false,
+      "dominios": ["DominioCiber", "DominioEspacio"], 
+      "numDependencias": 4
+    },
+    {
+      "id": "Activo_Radio_Tactico",
+      "tipo_activo": "Comunicaciones",
+      "criticidad": 0.5,
+      "contribuyeA": "Tarea_Enlace_Mando",
+      "peso": 0.30,
+      "conexiones_externas": 2,
+      "tiene_redundancia": true,
+      "dominios": ["DominioCiber", "DominioTierra"], 
+      "numDependencias": 1
+    },
+    {
+      "id": "Activo_Radar",
+      "tipo_activo": "Sensor",
+      "criticidad": 0.6,
+      "contribuyeA": "Tarea_Exploracion",
+      "peso": 1.0,
+      "conexiones_externas": 1,
+      "tiene_redundancia": true,
+      "dominios": ["DominioCiber"],
+      "numDependencias": 2
+    },
+    {
+      "id": "Activo_Servidor_Cripto",
+      "tipo_activo": "Servidor",
+      "criticidad": 0.8,
+      "contribuyeA": "Tarea_Cifrado_Datos",
+      "peso": 1.0,
+      "conexiones_externas": 3,
+      "tiene_redundancia": false,
+      "dominios": ["DominioCiber"],
+      "numDependencias": 5
+    }
+  ],
+  "incidentes": [
+    {
+      "id": "Interferencia_GPS_Critica",
+      "tipo_incidente": "Interferencia",
+      "afectaA": ["Activo_SATCOM_1"],
+      "dominios": ["DominioCiber"]
+    },
+    {
+      "id": "Inhibicion_Frecuencia_Radio",
+      "tipo_incidente": "Fallo",
+      "afectaA": ["Activo_Radio_Tactico"],
+      "dominios": ["DominioCiber"]
+    },
+    {
+      "id": "Ataque_DDoS_Radar",
+      "tipo_incidente": "Ataque",
+      "afectaA": ["Activo_Radar"],
+      "dominios": ["DominioCiber"]
+    },
+    {
+      "id": "Malware_Robo_Claves",
+      "tipo_incidente": "Sabotaje",
+      "afectaA": ["Activo_Servidor_Cripto"],
+      "dominios": ["DominioCiber"]
+    }
+  ]
+}
