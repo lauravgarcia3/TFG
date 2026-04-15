@@ -1,0 +1,23 @@
+{
+  "misiones": [{ "id": "Mision_Prueba_Extrema", "fase": "Ejecucion", "total_nodos_red": 1, "dominios": ["DominioCiber"] }],
+  "objetivos": [{ "id": "OBJ_Prueba", "contribuyeA": "Mision_Prueba_Extrema", "peso": 1.0 }],
+  "lineas_operacion": [{ "id": "LO_Prueba", "contribuyeA": "OBJ_Prueba", "peso": 1.0 }],
+  "condiciones_decisivas": [{ "id": "CD_Prueba", "contribuyeA": "LO_Prueba", "peso": 1.0, "umbral": 0.0 }],
+  "efectos": [{ "id": "EF_Prueba", "contribuyeA": "CD_Prueba", "peso": 1.0 }],
+  "acciones": [{ "id": "ACC_Prueba", "contribuyeA": "EF_Prueba", "peso": 1.0 }],
+  "tareas": [{ "id": "TAR_Prueba", "contribuyeA": "ACC_Prueba", "peso": 1.0 }],
+  "activos": [
+    { 
+      "id": "ACT_Prueba", 
+      "contribuyeA": "TAR_Prueba", 
+      "peso": 1.0, 
+      "criticidad": 1.0,
+      "conexiones_externas": 1,
+      "numDependencias": 1,
+      "tiene_redundancia": true,
+      "dominios": ["DominioCiber", "DominioTierra"],
+      "perteneceAMision": "Mision_Prueba_Extrema"
+    }
+  ],
+  "incidentes": []
+}
