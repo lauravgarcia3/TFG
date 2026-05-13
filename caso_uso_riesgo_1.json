@@ -1,0 +1,76 @@
+{
+  "misiones": [
+    {
+      "id": "Mision_Control_Bajo_Sabotaje",
+      "fase": "Ejecucion",
+      "total_nodos_red": 1,
+      "dominios": ["DominioCiber"]
+    }
+  ],
+  "objetivos": [
+    {
+      "id": "OBJ_Mantener_Servicio_Critico",
+      "contribuyeA": "Mision_Control_Bajo_Sabotaje",
+      "peso": 1.0
+    }
+  ],
+  "lineas_operacion": [
+    {
+      "id": "LO_Continuidad_Operativa",
+      "contribuyeA": "OBJ_Mantener_Servicio_Critico",
+      "peso": 1.0
+    }
+  ],
+  "condiciones_decisivas": [
+    {
+      "id": "CD_Servicio_Critico_Disponible",
+      "contribuyeA": "LO_Continuidad_Operativa",
+      "peso": 1.0,
+      "umbral": 0.3
+    }
+  ],
+  "efectos": [
+    {
+      "id": "EF_Continuidad_Servicio",
+      "contribuyeA": "CD_Servicio_Critico_Disponible",
+      "peso": 1.0
+    }
+  ],
+  "acciones": [
+    {
+      "id": "ACC_Control_Sistema",
+      "contribuyeA": "EF_Continuidad_Servicio",
+      "peso": 1.0
+    }
+  ],
+  "tareas": [
+    {
+      "id": "TAR_Operacion_Sistema_Critico",
+      "contribuyeA": "ACC_Control_Sistema",
+      "peso": 1.0
+    }
+  ],
+  "activos": [
+    {
+      "id": "ACT_Sistema_Control_Critico",
+      "contribuyeA": "TAR_Operacion_Sistema_Critico",
+      "peso": 1.0,
+      "criticidad": 1.0,
+      "conexiones_externas": 1,
+      "numDependencias": 1,
+      "tiene_redundancia": false,
+      "dominios": ["DominioCiber", "DominioTierra"],
+      "perteneceAMision": "Mision_Control_Bajo_Sabotaje"
+    }
+  ],
+  "incidentes": [
+    {
+      "id": "INC_Sabotaje_Sistema_Critico",
+      "tipo_incidente": "Sabotaje",
+      "prob": 0.9,
+      "imp": 0.9,
+      "afectaA": ["ACT_Sistema_Control_Critico"],
+      "dominios": ["DominioCiber"]
+    }
+  ]
+}
