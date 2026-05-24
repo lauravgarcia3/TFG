@@ -1,0 +1,79 @@
+{
+  "misiones": [
+    {
+      "id": "Mision_Operacion_Costa",
+      "fase": "Ejecucion",
+      "total_nodos_red": 18
+    },
+    {
+      "id": "Mision_Convoy_Tierra",
+      "fase": "Despliegue",
+      "total_nodos_red": 12
+    }
+  ],
+  "objetivos": [
+    { "id": "OBJ_Control_Litoral", "contribuyeA": "Mision_Operacion_Costa", "peso": 1.0 },
+    { "id": "OBJ_Proteccion_Convoy", "contribuyeA": "Mision_Convoy_Tierra", "peso": 1.0 }
+  ],
+  "lineas_operacion": [
+    { "id": "LO_Info_Maritima", "contribuyeA": "OBJ_Control_Litoral", "peso": 0.7 },
+    { "id": "LO_Proteccion_Fuerza", "contribuyeA": "OBJ_Control_Litoral", "peso": 0.3 },
+    { "id": "LO_Apoyo_Tierra", "contribuyeA": "OBJ_Proteccion_Convoy", "peso": 1.0 }
+  ],
+  "condiciones_decisivas": [
+    { "id": "CD_Superioridad_Info", "contribuyeA": "LO_Info_Maritima", "peso": 0.65, "umbral": 0.35 },
+    { "id": "CD_Continuidad_Mando", "contribuyeA": "LO_Proteccion_Fuerza", "peso": 0.35, "umbral": 0.40 },
+    { "id": "CD_Convoy_Seguro", "contribuyeA": "LO_Apoyo_Tierra", "peso": 1.0, "umbral": 0.30 }
+  ],
+  "efectos": [
+    { "id": "EF_Deteccion_Temprana", "contribuyeA": "CD_Superioridad_Info", "peso": 0.7 },
+    { "id": "EF_Imagen_Radar", "contribuyeA": "CD_Superioridad_Info", "peso": 0.3 },
+    { "id": "EF_Continuidad_Mando", "contribuyeA": "CD_Continuidad_Mando", "peso": 1.0 },
+    { "id": "EF_Cobertura_ISR", "contribuyeA": "CD_Convoy_Seguro", "peso": 0.6 },
+    { "id": "EF_Comunicacion_Convoy", "contribuyeA": "CD_Convoy_Seguro", "peso": 0.4 }
+  ],
+  "acciones": [
+    { "id": "ACC_Vigilancia_Conjunta", "contribuyeA": "EF_Deteccion_Temprana", "peso": 1.0 },
+    { "id": "ACC_Supervision_Radar", "contribuyeA": "EF_Imagen_Radar", "peso": 1.0 },
+    { "id": "ACC_Mantenimiento_Red", "contribuyeA": "EF_Continuidad_Mando", "peso": 1.0 },
+    { "id": "ACC_ISR_UAV", "contribuyeA": "EF_Cobertura_ISR", "peso": 1.0 },
+    { "id": "ACC_Enlace_Convoy", "contribuyeA": "EF_Comunicacion_Convoy", "peso": 1.0 }
+  ],
+  "tareas": [
+    { "id": "TAR_Enlace_Mando", "contribuyeA": "ACC_Vigilancia_Conjunta", "peso": 0.60 },
+    { "id": "TAR_Exploracion", "contribuyeA": "ACC_Vigilancia_Conjunta", "peso": 0.40 },
+    { "id": "TAR_Imagen_Radar", "contribuyeA": "ACC_Supervision_Radar", "peso": 1.0 },
+    { "id": "TAR_Cifrado_Datos", "contribuyeA": "ACC_Mantenimiento_Red", "peso": 1.0 },
+    { "id": "TAR_ISR_UAV", "contribuyeA": "ACC_ISR_UAV", "peso": 1.0 },
+    { "id": "TAR_BMS_Convoy", "contribuyeA": "ACC_Enlace_Convoy", "peso": 0.6 },
+    { "id": "TAR_Enlace_Microondas", "contribuyeA": "ACC_Enlace_Convoy", "peso": 0.4 }
+  ],
+  "activos": [
+    { "id": "ACT_SATCOM_1", "tipo_activo": "Comunicaciones", "criticidad": 0.9, "contribuyeA": "TAR_Enlace_Mando", "peso": 0.6, "conexiones_externas": 10, "tiene_redundancia": false, "dominios": ["DominioCiber", "DominioEspacio"], "numDependencias": 5, "perteneceAMision": "Mision_Operacion_Costa" },
+    { "id": "ACT_Radio_Tactico", "tipo_activo": "Comunicaciones", "criticidad": 0.5, "contribuyeA": "TAR_Enlace_Mando", "peso": 0.4, "conexiones_externas": 3, "tiene_redundancia": true, "dominios": ["DominioCiber", "DominioTierra"], "numDependencias": 1, "perteneceAMision": "Mision_Operacion_Costa" },
+    { "id": "ACT_Radar_Costa", "tipo_activo": "Sensor", "criticidad": 0.7, "contribuyeA": "TAR_Imagen_Radar", "peso": 1.0, "conexiones_externas": 4, "tiene_redundancia": false, "dominios": ["DominioCiber", "DominioMar"], "numDependencias": 2, "perteneceAMision": "Mision_Operacion_Costa" },
+    { "id": "ACT_Servidor_Cripto", "tipo_activo": "Servidor", "criticidad": 0.85, "contribuyeA": "TAR_Cifrado_Datos", "peso": 1.0, "conexiones_externas": 3, "tiene_redundancia": false, "dominios": ["DominioCiber"], "numDependencias": 6, "perteneceAMision": "Mision_Operacion_Costa" },
+    { "id": "ACT_Servidor_Backup", "tipo_activo": "Servidor", "criticidad": 0.6, "contribuyeA": "TAR_Cifrado_Datos", "peso": 0.4, "conexiones_externas": 1, "tiene_redundancia": true, "dominios": ["DominioCiber"], "numDependencias": 2, "perteneceAMision": "Mision_Operacion_Costa" },
+    { "id": "ACT_Radio_Secundaria", "tipo_activo": "Comunicaciones", "criticidad": 0.45, "contribuyeA": "TAR_Enlace_Mando", "peso": 0.2, "conexiones_externas": 1, "tiene_redundancia": true, "dominios": ["DominioCiber", "DominioTierra"], "numDependencias": 1, "perteneceAMision": "Mision_Operacion_Costa" },
+    { "id": "ACT_UAV_ISR", "tipo_activo": "Plataforma", "criticidad": 0.65, "contribuyeA": "TAR_ISR_UAV", "peso": 1.0, "conexiones_externas": 2, "tiene_redundancia": true, "dominios": ["DominioCiber", "DominioEspacio", "DominioTierra"], "numDependencias": 2, "perteneceAMision": "Mision_Convoy_Tierra" },
+    { "id": "ACT_BMS", "tipo_activo": "Sistema", "criticidad": 0.7, "contribuyeA": "TAR_BMS_Convoy", "peso": 1.0, "conexiones_externas": 4, "tiene_redundancia": true, "dominios": ["DominioCiber", "DominioTierra"], "numDependencias": 3, "perteneceAMision": "Mision_Convoy_Tierra" },
+    { "id": "ACT_Relay_Microondas", "tipo_activo": "Comunicaciones", "criticidad": 0.4, "contribuyeA": "TAR_Enlace_Microondas", "peso": 1.0, "conexiones_externas": 1, "tiene_redundancia": true, "dominios": ["DominioCiber", "DominioTierra"], "numDependencias": 1, "perteneceAMision": "Mision_Convoy_Tierra" },
+    { "id": "ACT_ICS_Combustible", "tipo_activo": "ICS", "criticidad": 0.8, "contribuyeA": "TAR_Enlace_Microondas", "peso": 0.6, "conexiones_externas": 2, "tiene_redundancia": false, "dominios": ["DominioCiber", "DominioTierra"], "numDependencias": 4, "perteneceAMision": "Mision_Convoy_Tierra" },
+    { "id": "ACT_SOC", "tipo_activo": "Seguridad", "criticidad": 0.6, "contribuyeA": "TAR_BMS_Convoy", "peso": 0.4, "conexiones_externas": 2, "tiene_redundancia": true, "dominios": ["DominioCiber"], "numDependencias": 2, "perteneceAMision": "Mision_Convoy_Tierra" },
+    { "id": "ACT_Puesto_Mando_Convoy", "tipo_activo": "Centro", "criticidad": 0.75, "contribuyeA": "TAR_BMS_Convoy", "peso": 0.5, "conexiones_externas": 5, "tiene_redundancia": false, "dominios": ["DominioCiber", "DominioTierra"], "numDependencias": 3, "perteneceAMision": "Mision_Convoy_Tierra" }
+  ],
+  "incidentes": [
+    { "id": "INC_Interferencia_GPS_SATCOM", "tipo_incidente": "Interferencia", "afectaA": ["ACT_SATCOM_1"], "dominios": ["DominioCiber"] },
+    { "id": "INC_Inhibicion_Radio_Principal", "tipo_incidente": "Fallo", "afectaA": ["ACT_Radio_Tactico"], "dominios": ["DominioCiber"] },
+    { "id": "INC_DDoS_Radar_Costa", "tipo_incidente": "Ataque", "afectaA": ["ACT_Radar_Costa"], "dominios": ["DominioCiber"] },
+    { "id": "INC_Malware_Servidor_Cripto", "tipo_incidente": "Sabotaje", "afectaA": ["ACT_Servidor_Cripto"], "dominios": ["DominioCiber"] },
+    { "id": "INC_Anomalia_Backup", "tipo_incidente": "Fallo", "afectaA": ["ACT_Servidor_Backup"], "dominios": ["DominioCiber"] },
+    { "id": "INC_Interferencia_Radio_Sec", "tipo_incidente": "Interferencia", "afectaA": ["ACT_Radio_Secundaria"], "dominios": ["DominioCiber"] },
+    { "id": "INC_Jamming_UAV", "tipo_incidente": "Interferencia", "afectaA": ["ACT_UAV_ISR"], "dominios": ["DominioCiber"] },
+    { "id": "INC_Ataque_BMS", "tipo_incidente": "Ataque", "afectaA": ["ACT_BMS"], "dominios": ["DominioCiber"] },
+    { "id": "INC_Fallo_Microondas", "tipo_incidente": "Fallo", "afectaA": ["ACT_Relay_Microondas"], "dominios": ["DominioCiber"] },
+    { "id": "INC_Sabotaje_ICS", "tipo_incidente": "Sabotaje", "afectaA": ["ACT_ICS_Combustible"], "dominios": ["DominioCiber"] },
+    { "id": "INC_Ataque_SOC", "tipo_incidente": "Ataque", "afectaA": ["ACT_SOC"], "dominios": ["DominioCiber"] },
+    { "id": "INC_Ataque_PM_Convoy", "tipo_incidente": "Ataque", "afectaA": ["ACT_Puesto_Mando_Convoy"], "dominios": ["DominioCiber"] }
+  ]
+}
